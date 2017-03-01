@@ -3,7 +3,7 @@
 //----------------------------------------------------------------------------
 // StateMachine
 //----------------------------------------------------------------------------
-StateMachine::StateMachine(unsigned char maxStates, unsigned char initialState) :
+StateMachine::StateMachine(unsigned int maxStates, unsigned int initialState) :
     MAX_STATES(maxStates),
     m_currentState(initialState),
     m_newState(0),
@@ -15,7 +15,7 @@ StateMachine::StateMachine(unsigned char maxStates, unsigned char initialState) 
 //----------------------------------------------------------------------------
 // ExternalEvent
 //----------------------------------------------------------------------------
-void StateMachine::ExternalEvent(unsigned char newState, const EventData* pData) {
+void StateMachine::ExternalEvent(unsigned int newState, const EventData* pData) {
     // If we are supposed to ignore this event
     if (newState == EVENT_IGNORED) {
         // Just delete the event data, if any
@@ -39,7 +39,7 @@ void StateMachine::ExternalEvent(unsigned char newState, const EventData* pData)
 //----------------------------------------------------------------------------
 // InternalEvent
 //----------------------------------------------------------------------------
-void StateMachine::InternalEvent(unsigned char newState, const EventData* pData) {
+void StateMachine::InternalEvent(unsigned int newState, const EventData* pData) {
     if (pData == NULL)
         pData = new NoEventData();
 

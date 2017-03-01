@@ -3,10 +3,12 @@
 
 #include "ros/ros.h"
 #include "StateMachine/StateMachine.h"
-#include "state_machine_msgs/GetState.h"
+#include "state_machine_msgs/SendState.h"
 #include <signal.h>
 
 sig_atomic_t volatile g_request_shutdown = 0;
+
+namespace ros_base {
 
 enum Errors {
     NO_ERROR,
@@ -20,7 +22,8 @@ class ROSNode : public StateMachine {
 private:
     sig_atomic_t volatile g_error;
     ros::AsyncSpinner spinner;
-    ros::ServiceServer stateService;
+    ros::ServiceClient stateService;
+    state_machine_msgs::SendState lastState;
     
     enum States {
         ST_INIT,
@@ -43,18 +46,20 @@ private:
     END_STATE_MAP
     
     bool initialize();
-    bool stateServiceCallback(state_machine_msgs::GetState::Request&, state_machine_msgs::GetState::Response &);
-    
+    bool notifyState();
 public:
     ROSNode();
     void start();
 protected:
     ros::NodeHandle handle;
-        
-    void faultDetected(Errors );
+    
+    void setName(std::string name);
+    void faultDetected(Errors e);
     bool noError();
     bool virtual prepare() = 0;
     void virtual errorHandling() = 0;
+    void virtual tearDown() = 0;
+};
 };
 
 #endif

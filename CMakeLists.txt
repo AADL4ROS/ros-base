@@ -130,6 +130,7 @@ target_link_libraries(ROSNode ${catkin_LIBRARIES})
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
+add_dependencies(ROSNode state_machine_msgs_generate_messages_cpp)
 # add_dependencies(aadl_ros ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 add_executable(node_reference

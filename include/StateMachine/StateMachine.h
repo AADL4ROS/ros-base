@@ -156,33 +156,33 @@ public:
 
     ///Constructor.
     ///@param[in] maxStates - the maximum number of state machine states.
-    StateMachine(unsigned char maxStates, unsigned char initialState = 0);
+    StateMachine(unsigned int maxStates, unsigned int initialState = 0);
 
     virtual ~StateMachine() {}
 
     /// Gets the current state machine state.
     /// @return Current state machine state.
-    unsigned char GetCurrentState() { return m_currentState; }
+    unsigned int GetCurrentState() { return m_currentState; }
 protected:
     /// External state machine event.
     /// @param[in] newState - the state machine state to transition to.
     /// @param[in] pData - the event data sent to the state.
-    void ExternalEvent(unsigned char newState, const EventData* pData = NULL);
+    void ExternalEvent(unsigned int newState, const EventData* pData = NULL);
 
     /// Internal state machine event. These events are generated while executing
     ///within a state machine state.
     /// @param[in] newState - the state machine state to transition to.
     /// @param[in] pData - the event data sent to the state.
-    void InternalEvent(unsigned char newState, const EventData* pData = NULL);	
+    void InternalEvent(unsigned int newState, const EventData* pData = NULL);	
 private:
     /// The maximum number of state machine states.
-    const unsigned char MAX_STATES;
+    const unsigned int MAX_STATES;
 
     /// The current state machine state.
-    unsigned char m_currentState;
+    unsigned int m_currentState;
 
     /// The new state the state machine has yet to transition to. 
-    unsigned char m_newState;
+    unsigned int m_newState;
 
     /// Set to TRUE when an event is generated.
     int m_eventGenerated;
@@ -208,7 +208,7 @@ private:
 
     /// Set a new current state.
     /// @param[in] newState - the new state.
-    void SetCurrentState(unsigned char newState) { m_currentState = newState; }
+    void SetCurrentState(unsigned int newState) { m_currentState = newState; }
 
     /// State machine engine that executes the external event and, optionally, all 
     /// internal events generated during state execution.
@@ -246,7 +246,7 @@ private:
     void stateMachine::EX_##exitName(void)
 
 #define BEGIN_TRANSITION_MAP \
-    static const unsigned char TRANSITIONS[] = {\
+    static const unsigned int TRANSITIONS[] = {\
 
 #define TRANSITION_MAP_ENTRY(entry)\
     entry,
@@ -254,7 +254,7 @@ private:
 #define END_TRANSITION_MAP(data) \
     };\
     ExternalEvent(TRANSITIONS[GetCurrentState()], data); \
-    C_ASSERT((sizeof(TRANSITIONS)/sizeof(unsigned char)) == ST_MAX_STATES); 
+    C_ASSERT((sizeof(TRANSITIONS)/sizeof(unsigned int)) == ST_MAX_STATES); 
 
 #define BEGIN_STATE_MAP \
     private:\
