@@ -1,0 +1,6 @@
+<launch>
+    <node name="reference" pkg="aadl_ros" type="node_reference" output="screen">
+        <param name="param_a" value="10" />
+        <param name="param_b" value="11" />
+    </node>
+</launch>
