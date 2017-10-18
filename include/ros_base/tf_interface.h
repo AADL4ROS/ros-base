@@ -11,14 +11,14 @@ namespace ros_base {
         std::string parent;
         std::string child;
         double time;
-        
-        Transform(std
     };
     
     class TransformationFrames {
+    private:
         tf::TransformBroadcaster broadcaster;
         tf::TransformListener listener;
         
+    public:
         void sendTransform(Transform t);
         Transform retriveTransform(std::string, std::string, double time = 0);
     };
