@@ -1,4 +1,5 @@
 #include "ros_base/ROSNode.h"
+#include "ros_base/tf_interface.h"
 #include "std_msgs/String.h"
 
 #include "package_example/node_configuration.h"
@@ -11,6 +12,7 @@ private:
     void tearDown();
     
     InternalState is;
+    ros_base::TransformationFrames *tf;
     ros::Publisher pub;
     ros::Timer timer;
     void pubCallback(const ros::TimerEvent&);
@@ -20,10 +22,11 @@ public:
 
 example_node::example_node() {
     setName(ros::this_node::getName());
+    tf = new ros_base::TransformationFrames();
 }
 
 void example_node::pubCallback(const ros::TimerEvent&) {
-    pub.publish(increment(is.vars(), is.params()));
+    pub.publish(increment(is.vars(), is.params(), tf));
 }
 
 bool example_node::prepare() {

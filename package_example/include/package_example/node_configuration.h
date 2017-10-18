@@ -2,6 +2,7 @@
 #define _NODE_CONFIGURATION_H
 
 #include "ros_base/Configuration.h"
+#include "ros_base/tf_interface.h"
 
 struct Parameters : ros_base::ParametersBase {
     int increment;
