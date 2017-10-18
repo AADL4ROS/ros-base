@@ -24,6 +24,7 @@ namespace ros_base {
         ros::AsyncSpinner spinner;
         ros::ServiceClient stateService;
         state_machine_msgs::SendState lastState;
+        double frequency;
         
         enum States {
             ST_INIT,
@@ -48,7 +49,7 @@ namespace ros_base {
         bool initialize();
         bool notifyState();
     public:
-        ROSNode();
+        ROSNode(double frequency = 1);
         void start();
     protected:
         ros::NodeHandle handle;

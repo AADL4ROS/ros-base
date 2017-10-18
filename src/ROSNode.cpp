@@ -2,9 +2,10 @@
 
 namespace ros_base {
 
-ROSNode::ROSNode() : StateMachine(ST_MAX_STATES), spinner(0), handle("~") {
+ROSNode::ROSNode(double frequency) : StateMachine(ST_MAX_STATES), spinner(0), handle("~") {
     g_error = NO_ERROR;
     lastState.request.state = ST_MAX_STATES;
+    this->frequency = frequency;
 }
 
 void ROSNode::faultDetected(Errors e) {
@@ -71,7 +72,7 @@ STATE_DEFINE(ROSNode, Init, NoEventData) {
 
 STATE_DEFINE(ROSNode, Running, NoEventData) {
     notifyState();
-    usleep(1000);
+    usleep(1/frequency * 1000);
     if(!noError())
         InternalEvent(ST_ERROR);
     else if(g_request_shutdown)
