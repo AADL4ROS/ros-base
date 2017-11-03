@@ -2,10 +2,11 @@
 
 namespace ros_base {
 
-ROSNode::ROSNode(double frequency) : StateMachine(ST_MAX_STATES), spinner(0), handle("~") {
+ROSNode::ROSNode(double frequency, bool critical) : StateMachine(ST_MAX_STATES), spinner(0), handle("~") {
     g_error = NO_ERROR;
     lastState.request.state = ST_MAX_STATES;
     this->frequency = frequency;
+    this->critical = critical;
 }
 
 void ROSNode::faultDetected(Errors e) {
@@ -47,13 +48,11 @@ void ROSNode::errorHandling() {
     InternalEvent(ST_CLOSING);
 }
 
-bool ROSNode::notifyState() {
-    if(GetCurrentState() != lastState.request.state) {
+void ROSNode::notifyState() {
+    if(critical || GetCurrentState() != lastState.request.state) {
         lastState.request.state = GetCurrentState();
         stateService.call(lastState);
-        return lastState.response.ok;
     }
-    return true;    
 }
 
 void ROSNode::setName(std::string node_name) {

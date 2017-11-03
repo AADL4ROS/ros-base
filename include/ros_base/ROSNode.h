@@ -25,6 +25,7 @@ namespace ros_base {
         ros::ServiceClient stateService;
         state_machine_msgs::SendState lastState;
         double frequency;
+        bool critical;
         
         enum States {
             ST_INIT,
@@ -47,9 +48,9 @@ namespace ros_base {
         END_STATE_MAP
         
         bool initialize();
-        bool notifyState();
+        void notifyState();
     public:
-        ROSNode(double frequency = 1);
+        ROSNode(double frequency = 1, bool critical = false);
         void start();
     protected:
         ros::NodeHandle handle;
