@@ -9,14 +9,21 @@ GlobalStateMachine::GlobalStateMachine(unsigned int init) {
     ShmemAllocator alloc_inst(segment.get_segment_manager());
     transitions = segment.construct<StateMap>("transitions")(std::less<MapKey>(), alloc_inst);
     currentState = segment.construct<unsigned int>("currentState")(init);
+    //HALT: 0, SAFE: 1, MANUAL: 2, ASSISTED: 3, AUTO: 4
     *transitions = {
         {std::make_pair(0, 1), 1},
+        {std::make_pair(1, 0), 0},
         {std::make_pair(1, 2), 2},
-        {std::make_pair(2, 0), 0},
-        {std::make_pair(0, 3), 3},
         {std::make_pair(1, 3), 3},
+        {std::make_pair(1, 4), 4},
+        {std::make_pair(2, 0), 0},
+        {std::make_pair(2, 1), 1},
         {std::make_pair(2, 3), 3},
-        {std::make_pair(3, 1), 1}
+        {std::make_pair(3, 0), 0},
+        {std::make_pair(3, 1), 1},
+        {std::make_pair(3, 2), 2},
+        {std::make_pair(4, 0), 0},
+        {std::make_pair(4, 1), 1}
     };
 }
 
