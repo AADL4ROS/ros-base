@@ -1,55 +1,52 @@
 #ifndef _TF_INTERFACE_H_
 #define _TF_INTERFACE_H_
 
-#include "tf/transform_broadcaster.h"
-#include "tf/transform_listener.h"
+#include "tf2_ros/transform_listener.h"
+#include "tf2_ros/transform_broadcaster.h"
+#include "tf2_geometry_msgs/tf2_geometry_msgs.h"
+#include "tf2/utils.h"
 
 namespace ros_base {
-    struct Transform {
-        std::array<double, 4> rotation;
-        std::array<double, 3> position;
-        std::string parent;
-        std::string child;
-        double time;
-    };
-    
     class TransformationFrames {
     private:
-        tf::TransformBroadcaster broadcaster;
-        tf::TransformListener listener;
-        
+        tf2_ros::Buffer tfBuffer;
+        tf2_ros::TransformListener tfListener;
+        tf2_ros::TransformBroadcaster br;
     public:
-        void sendTransform(Transform t);
-        Transform retriveTransform(std::string, std::string, double time = 0);
+        void sendTransform(std::string parent, std::string child, double time, geometry_msgs::Transform t);
+        geometry_msgs::Transform retriveTransform(std::string, std::string, double time = 0);
+        TransformationFrames();
     };
     
-    Transform TransformationFrames::retriveTransform(std::string parent, std::string child, double time) {
-        tf::StampedTransform tr;
+    geometry_msgs::Transform TransformationFrames::retriveTransform(std::string parent, std::string child, double time) {
+        geometry_msgs::TransformStamped transformStamped;
         try {
-            listener.lookupTransform(parent, child, ros::Time(time), tr);
+            transformStamped = tfBuffer.lookupTransform(parent, child, ros::Time(time));
+        } catch (tf2::TransformException &ex) {
+            ROS_WARN_STREAM(ex.what());
+            ROS_WARN_STREAM("lookup failed, trying waiting for 0.5 s");
+            ros::Duration(0.5).sleep();
+            try {
+                transformStamped = tfBuffer.lookupTransform(parent, child, ros::Time(time));
+            } catch (tf2::TransformException &ex) {
+                ROS_FATAL_STREAM(ex.what());
+                ROS_FATAL_STREAM("Cannot find transform after waiting, abort");
+                //TODO
+            }
         }
-        catch (tf::TransformException ex) {
-            //TODO
-            throw ex;
-        }
-        
-        Transform t;
-        
-        t.position = {tr.getOrigin().x(), tr.getOrigin().y(), tr.getOrigin().z()};
-        t.rotation = {tr.getRotation().x(), tr.getRotation().y(), tr.getRotation().z(), tr.getRotation().w()};
-        t.parent = parent;
-        t.child = child;
-        t.time = time;
-        return t;
+        return transformStamped.transform;
     }
     
-    void TransformationFrames::sendTransform(Transform t) {
-         tf::Transform transform(
-             tf::Quaternion(t.rotation[0], t.rotation[1], t.rotation[2], t.rotation[3]),
-             tf::Vector3(t.position[0], t.position[1], t.position[2])
-         );
-         broadcaster.sendTransform(tf::StampedTransform(transform, ros::Time(t.time), t.parent, t.child));
+    void TransformationFrames::sendTransform(std::string parent, std::string child, double time, geometry_msgs::Transform t) {
+        geometry_msgs::TransformStamped transformStamped;
+        transformStamped.header.stamp = ros::Time(time);
+        transformStamped.header.frame_id = parent;
+        transformStamped.child_frame_id = child;
+        transformStamped.transform = t;
+        br.sendTransform(transformStamped);
     }
+    
+    TransformationFrames::TransformationFrames() : tfBuffer(), tfListener(tfBuffer) {}
 
 };
 
