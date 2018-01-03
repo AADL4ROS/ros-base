@@ -1,0 +1,3 @@
+<launch>
+    <node name="overseer" pkg="ros_base" type="overseer" output="screen" launch-prefix="valgrind"/>
+</launch>
