@@ -2,24 +2,28 @@
 #define _LIFE_CYCLE_H_
 
 #include <vector>
+#include <map>
 
 namespace life_cycle {
-enum States {
-    ST_INITIAL = 0,
-    ST_FINAL,
-    ST_INVALID
-};
+
+typedef void (*StateFunction)(void);
+enum class States;
 
 class LifeCycle {
 public:
-    LifeCycle(unsigned int inital_state);
+    LifeCycle(States inital_state);
     void Start();
+protected:
+    bool SelectNextState(States next_state);
+    
+    std::map<States, StateFunction> state_actions_;
+    std::vector<std::pair<States, States>> transition_list_;
 private:
-    bool LifeCycleEngine();
     void NoValidTransition();
-    std::vector<States, States> transition_map_;
+    
+    bool valid_transition_;
     States current_state_;
-    States intial_state_;
+    States next_state_;
 };
 
 } // namespace life_cycle
