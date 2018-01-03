@@ -1,10 +1,17 @@
 #include "ros_base/ROSNode.h"
 
+enum class life_cycle::States {
+    ST_INIT,
+    ST_RUNNING,
+    ST_ERROR,
+    ST_CLOSING
+};
+
 namespace ros_base {
 
-ROSNode::ROSNode(double frequency, bool critical) : StateMachine(ST_MAX_STATES), spinner(0), handle("~") {
+ROSNode::ROSNode(double frequency, bool critical) : life_cycle::LifeCycle(life_cycle::States::ST_INIT), spinner(0), handle("~") {
     g_error = NO_ERROR;
-    lastState.request.state = ST_MAX_STATES;
+//     lastState.request.state = ST_MAX_STATES;
     this->frequency = frequency;
     this->critical = critical;
 }
@@ -26,15 +33,6 @@ bool ROSNode::noError() {
         return false;
 }
 
-void ROSNode::start() {
-    BEGIN_TRANSITION_MAP                          // - Current State -
-        TRANSITION_MAP_ENTRY (ST_INIT)            // ST_INIT
-        TRANSITION_MAP_ENTRY (CANNOT_HAPPEN)      // ST_RUNNING
-        TRANSITION_MAP_ENTRY (CANNOT_HAPPEN)      // ST_ERROR
-        TRANSITION_MAP_ENTRY (CANNOT_HAPPEN)      // ST_CLOSING
-    END_TRANSITION_MAP(NULL)
-}
-
 void ROSNode::errorHandling() {
     switch(g_error) {
         case PARAM_ERROR:
@@ -45,51 +43,51 @@ void ROSNode::errorHandling() {
         default:
             ROS_ERROR("Unidentified error, shutting down");
     }
-    InternalEvent(ST_CLOSING);
+    SelectNextState(life_cycle::States::ST_CLOSING);
 }
 
 void ROSNode::notifyState() {
-    if(critical || GetCurrentState() != lastState.request.state) {
-        lastState.request.state = GetCurrentState();
-        stateService.call(lastState);
-    }
+//     if(critical || GetCurrentState() != lastState.request.state) {
+//         lastState.request.state = GetCurrentState();
+//         stateService.call(lastState);
+//     }
 }
 
 void ROSNode::setName(std::string node_name) {
     lastState.request.node = node_name;
 }
 
-STATE_DEFINE(ROSNode, Init, NoEventData) {
+void ROSNode::Init() {
     if(initialize()) {
         notifyState();
         if(prepare())
-            InternalEvent(ST_RUNNING);
+            SelectNextState(life_cycle::States::ST_RUNNING);
         else
-            InternalEvent(ST_ERROR);
+            SelectNextState(life_cycle::States::ST_ERROR);
     }
 }
 
-STATE_DEFINE(ROSNode, Running, NoEventData) {
+void ROSNode::Running() {
     notifyState();
     usleep(1/frequency * 1000);
     if(!noError())
-        InternalEvent(ST_ERROR);
+        SelectNextState(life_cycle::States::ST_ERROR);
     else if(g_request_shutdown)
-        InternalEvent(ST_CLOSING);
+        SelectNextState(life_cycle::States::ST_CLOSING);
     else
-        InternalEvent(ST_RUNNING);
+        SelectNextState(life_cycle::States::ST_RUNNING);
 }
 
-STATE_DEFINE(ROSNode, Error, NoEventData) {
+void ROSNode::Error() {
     notifyState();
     errorHandling();
     if(!noError())
-        InternalEvent(ST_CLOSING);
+        SelectNextState(life_cycle::States::ST_CLOSING);
     else
-        InternalEvent(ST_RUNNING);
+        SelectNextState(life_cycle::States::ST_RUNNING);
 }
 
-STATE_DEFINE(ROSNode, Closing, NoEventData) {
+void ROSNode::Closing() {
     notifyState();
     tearDown();
     ros::shutdown();

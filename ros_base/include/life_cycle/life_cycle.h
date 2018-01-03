@@ -15,15 +15,19 @@ public:
     void Start();
 protected:
     bool SelectNextState(States next_state);
-    
-    std::map<States, StateFunction> state_actions_;
-    std::vector<std::pair<States, States>> transition_list_;
+    States GetCurrentState();
+    void AddTransition(States source_state, States destination_state);
+    void SetTransitionList(std::vector<std::pair<States, States>> transition_list);
+    void AddStateAction(States state, StateFunction function);
+    void SetStateActions(std::map<States, StateFunction> state_actions);
 private:
     void NoValidTransition();
     
     bool valid_transition_;
     States current_state_;
     States next_state_;
+    std::map<States, StateFunction> state_actions_;
+    std::vector<std::pair<States, States>> transition_list_;
 };
 
 } // namespace life_cycle

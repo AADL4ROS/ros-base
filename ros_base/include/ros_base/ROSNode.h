@@ -2,7 +2,7 @@
 #define _ROS_NODE_H
 
 #include "ros/ros.h"
-#include "StateMachine/StateMachine.h"
+#include "life_cycle/life_cycle.h"
 #include "state_machine_msgs/SendState.h"
 #include <signal.h>
 
@@ -17,8 +17,8 @@ namespace ros_base {
         PUB_FAILED,
         INVALID_MESSAGE
     };
-
-    class ROSNode : public StateMachine {
+    
+    class ROSNode : public life_cycle::LifeCycle {
     private:
         sig_atomic_t volatile g_error;
         ros::AsyncSpinner spinner;
@@ -26,32 +26,15 @@ namespace ros_base {
         state_machine_msgs::SendState lastState;
         double frequency;
         bool critical;
-        
-        enum States {
-            ST_INIT,
-            ST_RUNNING,
-            ST_ERROR,
-            ST_CLOSING,
-            ST_MAX_STATES
-        };
-        
-        STATE_DECLARE(ROSNode, Init,    NoEventData)
-        STATE_DECLARE(ROSNode, Running, NoEventData)
-        STATE_DECLARE(ROSNode, Error,   NoEventData)
-        STATE_DECLARE(ROSNode, Closing, NoEventData)
-            
-        BEGIN_STATE_MAP
-            STATE_MAP_ENTRY(&Init)
-            STATE_MAP_ENTRY(&Running)
-            STATE_MAP_ENTRY(&Error)
-            STATE_MAP_ENTRY(&Closing) 
-        END_STATE_MAP
-        
+                        
         bool initialize();
         void notifyState();
+        void Init();
+        void Running();
+        void Error();
+        void Closing();
     public:
         ROSNode(double frequency = 1, bool critical = false);
-        void start();
     protected:
         ros::NodeHandle handle;
         
