@@ -1,15 +1,15 @@
 #include "ros_base/ROSNode.h"
 
-enum class life_cycle::States {
+namespace ros_base {
+
+enum class States {
     ST_INIT,
     ST_RUNNING,
     ST_ERROR,
     ST_CLOSING
 };
 
-namespace ros_base {
-
-ROSNode::ROSNode(double frequency, bool critical) : life_cycle::LifeCycle(life_cycle::States::ST_INIT), spinner(0), handle("~") {
+ROSNode::ROSNode(double frequency, bool critical) : LifeCycle(States::ST_INIT), spinner(0), handle("~") {
     g_error = NO_ERROR;
 //     lastState.request.state = ST_MAX_STATES;
     this->frequency = frequency;
@@ -43,7 +43,7 @@ void ROSNode::errorHandling() {
         default:
             ROS_ERROR("Unidentified error, shutting down");
     }
-    SelectNextState(life_cycle::States::ST_CLOSING);
+    SelectNextState(States::ST_CLOSING);
 }
 
 void ROSNode::notifyState() {
@@ -61,9 +61,9 @@ void ROSNode::Init() {
     if(initialize()) {
         notifyState();
         if(prepare())
-            SelectNextState(life_cycle::States::ST_RUNNING);
+            SelectNextState(States::ST_RUNNING);
         else
-            SelectNextState(life_cycle::States::ST_ERROR);
+            SelectNextState(States::ST_ERROR);
     }
 }
 
@@ -71,20 +71,20 @@ void ROSNode::Running() {
     notifyState();
     usleep(1/frequency * 1000);
     if(!noError())
-        SelectNextState(life_cycle::States::ST_ERROR);
+        SelectNextState(States::ST_ERROR);
     else if(g_request_shutdown)
-        SelectNextState(life_cycle::States::ST_CLOSING);
+        SelectNextState(States::ST_CLOSING);
     else
-        SelectNextState(life_cycle::States::ST_RUNNING);
+        SelectNextState(States::ST_RUNNING);
 }
 
 void ROSNode::Error() {
     notifyState();
     errorHandling();
     if(!noError())
-        SelectNextState(life_cycle::States::ST_CLOSING);
+        SelectNextState(States::ST_CLOSING);
     else
-        SelectNextState(life_cycle::States::ST_RUNNING);
+        SelectNextState(States::ST_RUNNING);
 }
 
 void ROSNode::Closing() {

@@ -4,7 +4,7 @@
 #include <vector>
 #include <map>
 
-namespace life_cycle {
+namespace ros_base {
 
 typedef void (*StateFunction)(void);
 enum class States;
@@ -30,6 +30,6 @@ private:
     std::vector<std::pair<States, States>> transition_list_;
 };
 
-} // namespace life_cycle
+} // namespace ros_base
 
 #endif // _LIFE_CYCLE_H_

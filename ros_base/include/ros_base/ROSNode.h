@@ -2,7 +2,7 @@
 #define _ROS_NODE_H
 
 #include "ros/ros.h"
-#include "life_cycle/life_cycle.h"
+#include "ros_base/life_cycle.h"
 #include "state_machine_msgs/SendState.h"
 #include <signal.h>
 
@@ -18,7 +18,7 @@ namespace ros_base {
         INVALID_MESSAGE
     };
     
-    class ROSNode : public life_cycle::LifeCycle {
+    class ROSNode : public LifeCycle {
     private:
         sig_atomic_t volatile g_error;
         ros::AsyncSpinner spinner;

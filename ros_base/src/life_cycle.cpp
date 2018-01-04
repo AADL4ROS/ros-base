@@ -1,8 +1,8 @@
-#include "life_cycle/life_cycle.h"
+#include "ros_base/life_cycle.h"
 #include <utility>
 #include <algorithm>
 
-namespace life_cycle {
+namespace ros_base {
     States LifeCycle::GetCurrentState() {
         return current_state_;
     }
@@ -14,7 +14,7 @@ namespace life_cycle {
         
     }
     
-    void void LifeCycle::AddTransition(States source_state, States destination_state) {
+    void LifeCycle::AddTransition(States source_state, States destination_state) {
     }
 
     void LifeCycle::SetTransitionList(std::vector<std::pair<States, States> > transition_list) {
@@ -46,4 +46,4 @@ namespace life_cycle {
         return valid_transition_;
     }
 
-} // namespace life_cycle
+} // namespace ros_base
