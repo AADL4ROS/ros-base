@@ -67,11 +67,11 @@ add_dependencies(SMInterface state_machine_msgs_generate_messages_cpp)
 ## either from message generation or dynamic reconfigure
 # add_dependencies(aadl_ros ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-add_executable(node_reference
-    src/node_reference.cpp
-    include/StateMachine/Fault.cpp
-    include/StateMachine/StateMachine.cpp
-)
+# add_executable(node_reference
+#     src/node_reference.cpp
+#     include/StateMachine/Fault.cpp
+#     include/StateMachine/StateMachine.cpp
+# )
 
 add_executable(overseer
     src/Overseer.cpp
@@ -80,7 +80,7 @@ add_executable(overseer
 )
 add_dependencies(overseer state_machine_msgs_generate_messages_cpp)
 
-target_link_libraries(node_reference ${catkin_LIBRARIES})
+# target_link_libraries(node_reference ${catkin_LIBRARIES})
 target_link_libraries(overseer rt ${catkin_LIBRARIES})
 
 #add_executable(ROSNode

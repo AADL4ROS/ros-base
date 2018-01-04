@@ -14,6 +14,10 @@ ROSNode::ROSNode(double frequency, bool critical) : LifeCycle(States::ST_INIT), 
 //     lastState.request.state = ST_MAX_STATES;
     this->frequency = frequency;
     this->critical = critical;
+    AddStateAction(States::ST_INIT, &ROSNode::Init);
+    AddStateAction(States::ST_RUNNING, &ROSNode::Init);
+    AddStateAction(States::ST_ERROR, &Init);
+    AddStateAction(States::ST_CLOSING, &Init);
 }
 
 void ROSNode::start() {
