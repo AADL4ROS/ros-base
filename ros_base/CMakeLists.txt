@@ -48,8 +48,7 @@ include_directories(
 #Declare a C++ library
 add_library(ROSNode
    src/ROSNode.cpp
-   include/StateMachine/Fault.cpp
-   include/StateMachine/StateMachine.cpp
+   src/life_cycle.cpp
 )
 
 target_link_libraries(ROSNode ${catkin_LIBRARIES})

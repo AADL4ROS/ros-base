@@ -16,6 +16,10 @@ ROSNode::ROSNode(double frequency, bool critical) : LifeCycle(States::ST_INIT), 
     this->critical = critical;
 }
 
+void ROSNode::start() {
+    Start();
+}
+
 void ROSNode::faultDetected(Errors e) {
     g_error = e;
 }
@@ -51,6 +55,7 @@ void ROSNode::notifyState() {
 //         lastState.request.state = GetCurrentState();
 //         stateService.call(lastState);
 //     }
+    std::cout<<"switching state"<<std::endl;
 }
 
 void ROSNode::setName(std::string node_name) {

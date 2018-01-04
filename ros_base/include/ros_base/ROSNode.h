@@ -35,6 +35,7 @@ namespace ros_base {
         void Closing();
     public:
         ROSNode(double frequency = 1, bool critical = false);
+        void start();
     protected:
         ros::NodeHandle handle;
         

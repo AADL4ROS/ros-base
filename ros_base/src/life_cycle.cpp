@@ -17,7 +17,7 @@ namespace ros_base {
     void LifeCycle::AddTransition(States source_state, States destination_state) {
     }
 
-    void LifeCycle::SetTransitionList(std::vector<std::pair<States, States> > transition_list) {
+    void LifeCycle::SetTransitionList(std::vector<std::pair<States, States>> transition_list) {
         
     }
     
