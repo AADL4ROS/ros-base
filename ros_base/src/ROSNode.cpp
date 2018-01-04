@@ -2,8 +2,8 @@
 
 namespace ros_base {
 
-enum class States {
-    ST_INIT,
+enum class States : int {
+    ST_INIT = 0,
     ST_RUNNING,
     ST_ERROR,
     ST_CLOSING
@@ -11,13 +11,26 @@ enum class States {
 
 ROSNode::ROSNode(double frequency, bool critical) : LifeCycle(States::ST_INIT), spinner(0), handle("~") {
     g_error = NO_ERROR;
-//     lastState.request.state = ST_MAX_STATES;
+    lastState.request.state = -1;
     this->frequency = frequency;
     this->critical = critical;
-    AddStateAction(States::ST_INIT, &ROSNode::Init);
-    AddStateAction(States::ST_RUNNING, &ROSNode::Init);
-    AddStateAction(States::ST_ERROR, &Init);
-    AddStateAction(States::ST_CLOSING, &Init);
+    AddStateAction(States::ST_INIT, std::bind(&ROSNode::Init, this));
+    AddStateAction(States::ST_RUNNING, std::bind(&ROSNode::Running, this));
+    AddStateAction(States::ST_ERROR, std::bind(&ROSNode::Error, this));
+    AddStateAction(States::ST_CLOSING, std::bind(&ROSNode::Closing, this));
+    //TODO think about a wildcard
+    std::vector<std::pair<States, States>> transition_list = {
+        {States::ST_INIT, States::ST_RUNNING},
+        {States::ST_INIT, States::ST_ERROR},
+        {States::ST_INIT, States::ST_CLOSING},
+        {States::ST_RUNNING, States::ST_RUNNING},
+        {States::ST_RUNNING, States::ST_ERROR},
+        {States::ST_RUNNING, States::ST_CLOSING},
+        {States::ST_ERROR, States::ST_INIT},
+        {States::ST_ERROR, States::ST_RUNNING},
+        {States::ST_ERROR, States::ST_CLOSING}
+    };
+    SetTransitionList(transition_list);
 }
 
 void ROSNode::start() {
@@ -55,11 +68,11 @@ void ROSNode::errorHandling() {
 }
 
 void ROSNode::notifyState() {
-//     if(critical || GetCurrentState() != lastState.request.state) {
-//         lastState.request.state = GetCurrentState();
-//         stateService.call(lastState);
-//     }
-    std::cout<<"switching state"<<std::endl;
+    int current_state = (int) GetCurrentState();
+    if(critical || current_state != lastState.request.state) {
+        lastState.request.state = current_state;
+        stateService.call(lastState);
+    }
 }
 
 void ROSNode::setName(std::string node_name) {
@@ -67,6 +80,7 @@ void ROSNode::setName(std::string node_name) {
 }
 
 void ROSNode::Init() {
+    //TODO closing?
     if(initialize()) {
         notifyState();
         if(prepare())

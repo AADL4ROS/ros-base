@@ -2,23 +2,27 @@
 #include <utility>
 #include <algorithm>
 
+#include <iostream>
+
 namespace ros_base {
     States LifeCycle::GetCurrentState() {
         return current_state_;
     }
     
-    void LifeCycle::AddStateAction(States state, StateFunction function) {
+    void LifeCycle::AddStateAction(States state, std::function<void()> function) {
+        state_actions_.emplace(state, function);
     }
     
-    void LifeCycle::SetStateActions(std::map<States, StateFunction> state_actions) {
-        
+    void LifeCycle::SetStateActions(std::map<States, std::function<void()>> state_actions) {
+        state_actions_ = state_actions;        
     }
     
     void LifeCycle::AddTransition(States source_state, States destination_state) {
+        transition_list_.push_back(std::make_pair(source_state, destination_state));
     }
 
     void LifeCycle::SetTransitionList(std::vector<std::pair<States, States>> transition_list) {
-        
+        transition_list_ = transition_list;
     }
     
     LifeCycle::LifeCycle(States inital_state) {
@@ -27,11 +31,21 @@ namespace ros_base {
     }
 
     void LifeCycle::Start() {
+        if(state_actions_.size() <= 0) {
+            valid_transition_ = false;
+            std::cout<<"ya dun goof'd"<<std::endl;
+        }
+        
+        if(transition_list_.size() <= 0) {
+            valid_transition_ = false;
+            std::cout<<"ya dun goof'd"<<std::endl;
+        }
+        
         while(valid_transition_) {
             valid_transition_ = false;
             current_state_ = next_state_;
             auto iter = state_actions_.find(next_state_);
-            (*iter->second)();
+            iter->second();
         }
     }
     

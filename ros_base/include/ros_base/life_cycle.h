@@ -3,11 +3,11 @@
 
 #include <vector>
 #include <map>
+#include <functional>
 
 namespace ros_base {
 
-typedef void (*StateFunction)(void);
-enum class States;
+enum class States : int;
 
 class LifeCycle {
 public:
@@ -18,15 +18,15 @@ protected:
     States GetCurrentState();
     void AddTransition(States source_state, States destination_state);
     void SetTransitionList(std::vector<std::pair<States, States>> transition_list);
-    void AddStateAction(States state, StateFunction function);
-    void SetStateActions(std::map<States, StateFunction> state_actions);
+    void AddStateAction(States state, std::function<void()> function);
+    void SetStateActions(std::map<States, std::function<void()>> state_actions);
 private:
     void NoValidTransition();
     
     bool valid_transition_;
     States current_state_;
     States next_state_;
-    std::map<States, StateFunction> state_actions_;
+    std::map<States, std::function<void()>> state_actions_;
     std::vector<std::pair<States, States>> transition_list_;
 };
 
