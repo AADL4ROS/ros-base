@@ -3,16 +3,22 @@
 #include "state_machine_msgs/SetGlobalState.h"
 
 SMInterface::SMInterface() {
-    try {
-        gsm = new GlobalStateMachine();
-        realGet = &SMInterface::getGlobalStateFromMemory;
-        realSet = &SMInterface::setGlobalStateByMemory;
-    } catch (std::exception) {
-        get_state = handle.serviceClient<state_machine_msgs::GetGlobalState>("/get_global_state");
-        set_state = handle.serviceClient<state_machine_msgs::SetGlobalState>("/set_global_state");
-        realGet = &SMInterface::getGlobalStateFromROS;
-        realSet = &SMInterface::setGlobalStateByROS;
-    }    
+    while (true) {
+        if (GlobalStateMachine::Exists()) {
+            gsm = new GlobalStateMachine(load_gsm);
+            realGet = &SMInterface::getGlobalStateFromMemory;
+            realSet = &SMInterface::setGlobalStateByMemory;
+            return;
+        } else if (ros::service::exists("/get_global_state", true)) {
+            gsm = nullptr;
+            get_state = handle.serviceClient<state_machine_msgs::GetGlobalState>("/get_global_state");
+            set_state = handle.serviceClient<state_machine_msgs::SetGlobalState>("/set_global_state");
+            realGet = &SMInterface::getGlobalStateFromROS;
+            realSet = &SMInterface::setGlobalStateByROS;
+            return;
+        }
+        ros::Duration(1.0).sleep();
+    }
 }
 
 unsigned int SMInterface::getGlobalStateFromMemory() { return gsm->getState(); }

@@ -18,7 +18,7 @@ ROSNode::ROSNode(double frequency, bool critical) : LifeCycle(States::ST_INIT), 
     AddStateAction(States::ST_RUNNING, std::bind(&ROSNode::Running, this));
     AddStateAction(States::ST_ERROR, std::bind(&ROSNode::Error, this));
     AddStateAction(States::ST_CLOSING, std::bind(&ROSNode::Closing, this));
-    //TODO think about a wildcard
+    //TODO think about a wildcard?
     std::vector<std::pair<States, States>> transition_list = {
         {States::ST_INIT, States::ST_RUNNING},
         {States::ST_INIT, States::ST_ERROR},
@@ -42,6 +42,9 @@ void ROSNode::faultDetected(Errors e) {
 }
 
 bool ROSNode::initialize() {
+    if(critical) {
+        ros::service::waitForService("/state_notifier");
+    }
     spinner.start();
     stateService = handle.serviceClient<state_machine_msgs::SendState>("/state_notifier");
     return true;

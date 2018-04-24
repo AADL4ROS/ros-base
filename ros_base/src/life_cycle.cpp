@@ -31,20 +31,15 @@ namespace ros_base {
     }
 
     void LifeCycle::Start() {
-        if(state_actions_.size() <= 0) {
-            valid_transition_ = false;
-            std::cout<<"ya dun goof'd"<<std::endl;
-        }
-        
-        if(transition_list_.size() <= 0) {
-            valid_transition_ = false;
-            std::cout<<"ya dun goof'd"<<std::endl;
+        if(state_actions_.empty() || transition_list_.empty()) {
+            std::cout<<"Incomplete initialization, shutting down"<<std::endl;
+            return;
         }
         
         while(valid_transition_) {
             valid_transition_ = false;
             current_state_ = next_state_;
-            auto iter = state_actions_.find(next_state_);
+            auto iter = state_actions_.find(current_state_);
             iter->second();
         }
     }

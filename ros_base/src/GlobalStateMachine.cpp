@@ -1,47 +1,58 @@
 #include "ros_base/GlobalStateMachine.h"
 
-GlobalStateMachine::GlobalStateMachine(unsigned int init) {
+bool GlobalStateMachine::Exists() {
     using namespace boost::interprocess;
-    
-    shared_memory_object::remove("GlobalStateMachine");
-    segment = managed_shared_memory(create_only, "GlobalStateMachine", 65536, 0, permissions(0666));
-        
-    ShmemAllocator alloc_inst(segment.get_segment_manager());
-    transitions = segment.construct<StateMap>("transitions")(std::less<MapKey>(), alloc_inst);
-    currentState = segment.construct<unsigned int>("currentState")(init);
-    //HALT: 0, SAFE: 1, MANUAL: 2, ASSISTED: 3, AUTO: 4
-    *transitions = {
-        {std::make_pair(0, 1), 1},
-        {std::make_pair(1, 0), 0},
-        {std::make_pair(1, 2), 2},
-        {std::make_pair(1, 3), 3},
-        {std::make_pair(1, 4), 4},
-        {std::make_pair(2, 0), 0},
-        {std::make_pair(2, 1), 1},
-        {std::make_pair(2, 3), 3},
-        {std::make_pair(3, 0), 0},
-        {std::make_pair(3, 1), 1},
-        {std::make_pair(3, 2), 2},
-        {std::make_pair(4, 0), 0},
-        {std::make_pair(4, 1), 1}
-    };
+    try {
+        managed_shared_memory segment(open_only, kSegmentName);
+        return segment.check_sanity();
+    } 
+    catch (const std::exception &ex) {
+    }
+    return false;
 }
 
-GlobalStateMachine::GlobalStateMachine() {
+GlobalStateMachine::GlobalStateMachine(create_gsm_t) {
     using namespace boost::interprocess;
-    segment = managed_shared_memory(open_only, "GlobalStateMachine");
+    
+    shared_memory_object::remove(kSegmentName);
+    segment = managed_shared_memory(create_only, kSegmentName, 65536, 0, permissions(0666));
+        
+    ShmemAllocator alloc_inst(segment.get_segment_manager());
+    transitions = segment.construct<StateMap>(kTableName)(std::less<MapKey>(), alloc_inst);
+    currentState = segment.construct<unsigned int>(kStateName)(0);
+    initialized = segment.construct<bool>(kFlagName)(false);
+}
+
+GlobalStateMachine::GlobalStateMachine(load_gsm_t) {
+    using namespace boost::interprocess;
+    segment = managed_shared_memory(open_only, kSegmentName);
 
     std::pair<StateMap *, managed_shared_memory::size_type> tr_;
-    tr_ = segment.find<StateMap>("transitions");
+    tr_ = segment.find<StateMap>(kTableName);
     transitions = tr_.first;
 
     std::pair<unsigned int *, managed_shared_memory::size_type> cs_;
-    cs_ = segment.find<unsigned int>("currentState");
+    cs_ = segment.find<unsigned int>(kStateName);
     currentState = cs_.first;
     
+    std::pair<bool *, managed_shared_memory::size_type> fl_;
+    fl_ = segment.find<bool>(kFlagName);
+    initialized = fl_.first;
+}
+
+bool GlobalStateMachine::SetGlobalStateMachine(unsigned int init, 
+                                               std::map<std::pair<unsigned int, unsigned int>, unsigned int> transitions) {
+    for(auto it = transitions.begin(); it != transitions.end(); ++it) {
+        this->transitions->insert(std::make_pair(it->first, it->second));
+    }
+    *currentState = init;
+    *initialized = true;
 }
 
 bool GlobalStateMachine::setState(unsigned int state) {
+    if(!*initialized) {
+        throw std::exception();
+    }
     std::pair<unsigned int, unsigned int>  key = std::make_pair(*currentState, state);
     auto it = transitions->find(key);
     if(it != transitions->end()) {
@@ -50,11 +61,16 @@ bool GlobalStateMachine::setState(unsigned int state) {
     } else {
         return false;
     }
-    return true;
 }
 
-unsigned int GlobalStateMachine::getState() { return *currentState; }
+unsigned int GlobalStateMachine::getState() {
+    if(!*initialized) {
+        throw std::exception();
+    }
+    return *currentState;
+    
+}
 
 void GlobalStateMachine::cleanUp() {
-    boost::interprocess::shared_memory_object::remove("GlobalStateMachine");
+    boost::interprocess::shared_memory_object::remove(kSegmentName);
 }

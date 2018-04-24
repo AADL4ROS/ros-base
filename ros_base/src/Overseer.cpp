@@ -1,8 +1,26 @@
+#include "ros/network.h"
 #include "ros_base/Overseer.h"
 #include "std_msgs/Int32.h"
 #include "tinyxml2/tinyxml2.h"
 
-Overseer::Overseer() : gsm(0) {
+Overseer::Overseer() : gsm(create_gsm) {
+    std::map<std::pair<unsigned int, unsigned int>, unsigned int> transitions = {
+        {std::make_pair(0, 1), 1},
+        {std::make_pair(1, 0), 0},
+        {std::make_pair(1, 2), 2},
+        {std::make_pair(1, 3), 3},
+        {std::make_pair(1, 4), 4},
+        {std::make_pair(2, 0), 0},
+        {std::make_pair(2, 1), 1},
+        {std::make_pair(2, 3), 3},
+        {std::make_pair(3, 0), 0},
+        {std::make_pair(3, 1), 1},
+        {std::make_pair(3, 2), 2},
+        {std::make_pair(4, 0), 0},
+        {std::make_pair(4, 1), 1}
+    };
+    gsm.SetGlobalStateMachine(0, transitions);
+    
     tinyxml2::XMLDocument doc;
     doc.LoadFile("/home/gianluca/node_list.xml");
     tinyxml2::XMLElement * element = doc.FirstChild()->FirstChildElement("node");
@@ -25,6 +43,7 @@ bool Overseer::prepare() {
     set_global_state = handle.advertiseService("/set_global_state", &Overseer::setGlobalState, this);
     get_global_state = handle.advertiseService("/get_global_state", &Overseer::getGlobalState, this);
     notification = handle.advertise<std_msgs::Int32>("/global_state", 10);
+    ROS_INFO_STREAM(ros::network::getHost());
     return true;
 }
 
