@@ -27,7 +27,7 @@ find_package(Boost REQUIRED)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES ROSNode SMInterface
+  LIBRARIES ROSNode
   CATKIN_DEPENDS roscpp std_msgs state_machine_msgs
 #  DEPENDS system_lib
 )
@@ -54,13 +54,13 @@ add_library(ROSNode
 target_link_libraries(ROSNode ${catkin_LIBRARIES})
 add_dependencies(ROSNode state_machine_msgs_generate_messages_cpp)
 
-add_library(SMInterface
-   src/GlobalStateMachine.cpp
-   src/SMInterface.cpp
-)
+# add_library(SMInterface
+#    src/GlobalStateMachine.cpp
+#    src/SMInterface.cpp
+# )
 
-target_link_libraries(SMInterface ${catkin_LIBRARIES})
-add_dependencies(SMInterface state_machine_msgs_generate_messages_cpp)
+# target_link_libraries(SMInterface ${catkin_LIBRARIES})
+# add_dependencies(SMInterface state_machine_msgs_generate_messages_cpp)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -73,15 +73,15 @@ add_dependencies(SMInterface state_machine_msgs_generate_messages_cpp)
 #     include/StateMachine/StateMachine.cpp
 # )
 
-add_executable(overseer
-    src/Overseer.cpp
-    src/GlobalStateMachine.cpp
-    include/tinyxml2/tinyxml2.cpp
-)
-add_dependencies(overseer state_machine_msgs_generate_messages_cpp)
+# add_executable(overseer
+#     src/Overseer.cpp
+#     src/GlobalStateMachine.cpp
+#     include/tinyxml2/tinyxml2.cpp
+# )
+# add_dependencies(overseer state_machine_msgs_generate_messages_cpp)
 
 # target_link_libraries(node_reference ${catkin_LIBRARIES})
-target_link_libraries(overseer rt ${catkin_LIBRARIES})
+# target_link_libraries(overseer rt ${catkin_LIBRARIES})
 
 #add_executable(ROSNode
 #    src/ROSNode.cpp

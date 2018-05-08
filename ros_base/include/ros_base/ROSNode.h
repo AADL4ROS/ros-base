@@ -24,6 +24,7 @@ namespace ros_base {
         ros::AsyncSpinner spinner;
         ros::ServiceClient stateService;
         state_machine_msgs::SendState lastState;
+        std::string name;
         double frequency;
         bool critical;
                         

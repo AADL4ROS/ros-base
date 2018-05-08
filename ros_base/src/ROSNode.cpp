@@ -42,11 +42,14 @@ void ROSNode::faultDetected(Errors e) {
 }
 
 bool ROSNode::initialize() {
+    ROS_INFO_STREAM("Initializing node: "<<name);
     if(critical) {
+        ROS_INFO_STREAM("Critical node, waiting for state notifier");
         ros::service::waitForService("/state_notifier");
     }
     spinner.start();
     stateService = handle.serviceClient<state_machine_msgs::SendState>("/state_notifier");
+    ROS_INFO_STREAM("Initialization complete. Spinner up and running");
     return true;
 }
 
@@ -62,10 +65,10 @@ void ROSNode::errorHandling() {
         case PARAM_ERROR:
         case PUB_FAILED:
         case SUB_FAILED:
-            ROS_ERROR("Initialization error, shutting down");
+            ROS_ERROR_STREAM("Initialization error, shutting down");
             break;
         default:
-            ROS_ERROR("Unidentified error, shutting down");
+            ROS_ERROR_STREAM("Unidentified error, shutting down");
     }
     SelectNextState(States::ST_CLOSING);
 }
@@ -73,23 +76,28 @@ void ROSNode::errorHandling() {
 void ROSNode::notifyState() {
     int current_state = (int) GetCurrentState();
     if(critical || current_state != lastState.request.state) {
+        lastState.request.node = name;
         lastState.request.state = current_state;
         stateService.call(lastState);
     }
 }
 
 void ROSNode::setName(std::string node_name) {
-    lastState.request.node = node_name;
+     name = node_name;
 }
 
 void ROSNode::Init() {
     //TODO closing?
     if(initialize()) {
         notifyState();
-        if(prepare())
+        if(prepare()) {
+            ROS_INFO_STREAM("Preparation complete, "<<name<<" up and running");
             SelectNextState(States::ST_RUNNING);
-        else
+        }
+        else {
+            ROS_INFO_STREAM("Preparation failed");
             SelectNextState(States::ST_ERROR);
+        }
     }
 }
 
