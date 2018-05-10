@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>ros_base</name>
+  <name>node_base</name>
   <version>0.0.0</version>
   <description>a base skeleton to be used for implementing new nodes</description>
   <maintainer email="gianluca.bardaro@polimi.it">Gianluca Bardaro</maintainer>
