@@ -3,14 +3,14 @@
 /**
  * Auto-generated Internal State
  */
-#include "ros_base/Configuration.h"
-#include "ros_base/SMInterface.h"
+#include "node_base/Configuration.h"
+#include "node_base/SMInterface.h"
 
-struct Variables: ros_base::VariablesBase {
+struct Variables: node_base::VariablesBase {
     SMInterface smi;
 };
 
-struct Parameters: ros_base::ParametersBase {
+struct Parameters: node_base::ParametersBase {
     SMInterface smi;
     struct button_mapping_t { 
         int halt;
@@ -29,7 +29,7 @@ struct Parameters: ros_base::ParametersBase {
 typedef std::shared_ptr < const Parameters > Parameters_ptr;
 typedef std::shared_ptr < Variables > Variables_ptr;
 
-class InternalState: ros_base::InternalStateBase {
+class InternalState: node_base::InternalStateBase {
 public:
     
     Variables_ptr vars() {
@@ -40,7 +40,7 @@ public:
         return std::static_pointer_cast < const Parameters > (_params);
     };
     
-    void initialize (ros_base::ParametersBase * p = NULL) {
+    void initialize (node_base::ParametersBase * p = NULL) {
         _vars = std::make_shared < Variables > ();
         _params = std::make_shared < const Parameters > (*static_cast < Parameters * > (p));
     }

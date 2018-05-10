@@ -1,10 +1,10 @@
-#include "ros_base/life_cycle.h"
+#include "node_base/life_cycle.h"
 #include <utility>
 #include <algorithm>
 
 #include <iostream>
 
-namespace ros_base {
+namespace node_base {
     States LifeCycle::GetCurrentState() {
         return current_state_;
     }
@@ -55,4 +55,4 @@ namespace ros_base {
         return valid_transition_;
     }
 
-} // namespace ros_base
+} // namespace node_base

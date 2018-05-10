@@ -1,7 +1,7 @@
 #ifndef _CONFIGURATION_H
 #define _CONFIGURATION_H
 
-namespace ros_base {
+namespace node_base {
     struct ParametersBase {
     };
 

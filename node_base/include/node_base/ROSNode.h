@@ -2,13 +2,13 @@
 #define _ROS_NODE_H
 
 #include "ros/ros.h"
-#include "ros_base/life_cycle.h"
+#include "node_base/life_cycle.h"
 #include "state_machine_msgs/SendState.h"
 #include <signal.h>
 
 sig_atomic_t volatile g_request_shutdown = 0;
 
-namespace ros_base {
+namespace node_base {
 
     enum Errors {
         NO_ERROR,

@@ -1,18 +1,18 @@
-#include "ros_base/ROSNode.h"
-#include "ros_base/tf_interface.h"
+#include "node_base/ROSNode.h"
+#include "node_base/tf_interface.h"
 #include "std_msgs/String.h"
 
 #include "package_example/node_configuration.h"
 #include "package_example/logic.h"
 
-class example_node : public ros_base::ROSNode {
+class example_node : public node_base::ROSNode {
 private:
     bool prepare();
     void errorHandling();
     void tearDown();
     
     InternalState is;
-    ros_base::TransformationFrames *tf;
+    node_base::TransformationFrames *tf;
     ros::Publisher pub;
     ros::Timer timer;
     void pubCallback(const ros::TimerEvent&);
@@ -22,7 +22,7 @@ public:
 
 example_node::example_node() {
     setName(ros::this_node::getName());
-    tf = new ros_base::TransformationFrames();
+    tf = new node_base::TransformationFrames();
 }
 
 void example_node::pubCallback(const ros::TimerEvent&) {

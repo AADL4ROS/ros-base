@@ -1,6 +1,6 @@
-#include "ros_base/ROSNode.h"
+#include "node_base/ROSNode.h"
 
-namespace ros_base {
+namespace node_base {
 
 enum class States : int {
     ST_INIT = 0,

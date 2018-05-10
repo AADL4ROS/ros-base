@@ -1,14 +1,14 @@
 #ifndef _NODE_CONFIGURATION_H
 #define _NODE_CONFIGURATION_H
 
-#include "ros_base/Configuration.h"
-#include "ros_base/tf_interface.h"
+#include "node_base/Configuration.h"
+#include "node_base/tf_interface.h"
 
-struct Parameters : ros_base::ParametersBase {
+struct Parameters : node_base::ParametersBase {
     int increment;
 };
 
-struct Variables : ros_base::VariablesBase {
+struct Variables : node_base::VariablesBase {
     int incrementer;
     
     Variables() {
@@ -19,7 +19,7 @@ struct Variables : ros_base::VariablesBase {
 typedef std::shared_ptr<const Parameters> Parameters_ptr;
 typedef std::shared_ptr<Variables> Variables_ptr;
 
-class InternalState : ros_base::InternalStateBase {
+class InternalState : node_base::InternalStateBase {
 public:
     Variables_ptr vars() {
         return std::static_pointer_cast<Variables>(_vars);
@@ -29,7 +29,7 @@ public:
             return std::static_pointer_cast<const Parameters>(_params);
     };
         
-    void initialize(ros_base::ParametersBase * p) {
+    void initialize(node_base::ParametersBase * p) {
         _params = std::make_shared<const Parameters>(* static_cast<Parameters *>(p));
         _vars = std::make_shared<Variables>();
     }

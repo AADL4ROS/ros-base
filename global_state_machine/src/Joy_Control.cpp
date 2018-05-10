@@ -2,14 +2,14 @@
  * Node Joy_Control
  * File auto-generated on 22/11/2017 16:12:19
  */
-#include "ros_base/ROSNode.h"
+#include "node_base/ROSNode.h"
 #include "global_state_machine/Joy_Control_configuration.h"
 #include "sensor_msgs/Joy.h"
 #include "geometry_msgs/Twist.h"
 #include "global_state_machine/joy_to_cmd.h"
 
 
-class Joy_Control : public ros_base::ROSNode {
+class Joy_Control : public node_base::ROSNode {
 private:
     bool prepare();
     void tearDown();

@@ -7,7 +7,7 @@ set (CMAKE_CXX_STANDARD 11)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
-  ros_base
+  node_base
   state_machine_msgs
 )
 
@@ -116,7 +116,7 @@ catkin_package(
 # include_directories(include)
 include_directories(
   ${catkin_INCLUDE_DIRS}
-  ${ros_base_INCLUDE_DIRS}
+  ${node_base_INCLUDE_DIRS}
   include
 )
 
@@ -140,7 +140,7 @@ add_executable(node_example src/node_example.cpp)
 ## Specify libraries to link a library or executable target against
 target_link_libraries(node_example
    ${catkin_LIBRARIES}
-   ${ros_base_LIBRARIES}
+   ${node_base_LIBRARIES}
 )
 
 #############
